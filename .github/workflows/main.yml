@@ -1,7 +1,5 @@
 name: WeeklyReport
-
 "on": [workflow_dispatch]
-
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
