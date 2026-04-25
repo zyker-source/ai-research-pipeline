@@ -28,7 +28,7 @@ def run_research_pipeline():
     prompt = f"Bạn là chuyên gia Y sinh & AI. Hãy viết báo cáo nghiên cứu định kỳ từ dữ liệu sau: {raw_data}"
     
     response = client.models.generate_content(
-        model='gemini-1.5-flash',
+        model='gemini-2.5-flash',
         contents=prompt,
     )
     report_content = response.text
