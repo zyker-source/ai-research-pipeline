@@ -1,11 +1,11 @@
 import os
 import smtplib
 from email.message import EmailMessage
-import google.generativeai as genai
+from google import genai
 from groq import Groq
 
-# Cấu hình API
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+# Khởi tạo Client theo chuẩn SDK mới
+client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 groq_client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
 def send_email(subject, body):
@@ -13,24 +13,27 @@ def send_email(subject, body):
     msg.set_content(body)
     msg['Subject'] = subject
     msg['From'] = os.environ["EMAIL_USERNAME"]
-    msg['To'] = os.environ["EMAIL_USERNAME"] # Gửi cho chính bạn
+    msg['To'] = os.environ["EMAIL_USERNAME"]
 
+    # Lưu ý: EMAIL_PASSWORD phải là App Password 16 ký tự
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
         smtp.login(os.environ["EMAIL_USERNAME"], os.environ["EMAIL_PASSWORD"])
         smtp.send_message(msg)
 
 def run_research_pipeline():
-    # 1. Giả định lấy dữ liệu (Bạn có thể tích hợp Apify ở đây)
-    raw_data = "Nội dung 100 triệu từ hoặc danh sách transcript..."
+    # Giả định dữ liệu nghiên cứu
+    raw_data = "Nội dung 100 triệu từ hoặc danh sách transcript về Y sinh & AI..."
     
-    # 2. Dùng Gemini 1.5 Flash để tóm tắt và viết báo cáo (Free & Fast)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # Sử dụng model gemini-1.5-flash với cấu trúc gọi hàm mới
     prompt = f"Bạn là chuyên gia Y sinh & AI. Hãy viết báo cáo nghiên cứu định kỳ từ dữ liệu sau: {raw_data}"
     
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model='gemini-1.5-flash',
+        contents=prompt,
+    )
     report_content = response.text
 
-    # 3. Gửi báo cáo về Gmail
+    # Gửi báo cáo
     send_email("BÁO CÁO NGHIÊN CỨU AI ĐỊNH KỲ", report_content)
     print("Đã gửi báo cáo về Gmail thành công!")
 
